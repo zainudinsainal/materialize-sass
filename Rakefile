@@ -1,14 +1,14 @@
 require "bundler/gem_tasks"
 
-source_dir = "materialize-src" 
+source_dir = "materialize-src"
 
 namespace :javascripts do
-  
+
   desc "Cleaning javascripts directory"
   task :clean do
    rm_rf "app/assets/javascripts/materialize"
   end
-  
+
   desc "Copy #{source_dir}/js/"
   task :copy do
     src_dir = "#{source_dir}/js/."
@@ -17,9 +17,9 @@ namespace :javascripts do
     cp_r src_dir, tgt_dir
     cp "#{source_dir}/bin/materialize.js", "app/assets/javascripts"
   end
-  
+
   ##todo
-  # materialize-sprockets.js  
+  # materialize-sprockets.js
 
   desc "Copy #{source_dir}/extras/"
   task :copy_extras do
@@ -28,22 +28,22 @@ namespace :javascripts do
     mkdir_p tgt_dir
     cp_r src_dir, tgt_dir
   end
-  
+
   task :turbolinks_init do
     files =  Dir.glob('app/assets/javascripts/materialize/**/*.js').reject { |file| file.end_with?(".min.js") and File.file?(file) }
     files.each do |file|
-      selected_files = %w(buttons.js cards.js character_counter.js chips.js collapsible.js 
+      selected_files = %w(buttons.js cards.js character_counter.js chips.js collapsible.js
                           dropdown.js forms.js materialbox.js scrollspy.js tabs.js tooltip.js transitions.js)
       file_name = File.basename file
       #only selected file
       if selected_files.include?(file_name)
         content = File.read(file)
-        fixed_content = content.gsub("$(document).ready(", "$(document).on('turbolinks:load', ")
+        fixed_content = content.gsub("$(document).ready(", "$(document).on('ready turbolinks:load', ")
         File.open(file, "w") { |f| f.puts fixed_content}
       end
     end
-  end 
-  
+  end
+
 
   desc "Setup javascript assets"
   task setup: [:clean, :copy, :copy_extras, :turbolinks_init]
@@ -74,7 +74,7 @@ namespace :stylesheets do
     mkdir_p tgt_dir
     cp_r src_dir, tgt_dir
   end
- 
+
   desc "Fix url in stylesheets"
   task :fix_urls do
     Dir.glob('app/assets/stylesheets/**/*.scss').each do |file|
